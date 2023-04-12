@@ -42,6 +42,7 @@ class Net(nn.Module):
 
 def train(net, trainloader, epochs):
     """Train the model on the training set."""
+    print("Skip local training!")
     pass
     # criterion = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -54,6 +55,7 @@ def train(net, trainloader, epochs):
 
 def test(net, testloader):
     """Validate the model on the test set."""
+    print("Skip local evaluation!")
     return 0., 0.
     # criterion = torch.nn.CrossEntropyLoss()
     # correct, loss = 0, 0.0
