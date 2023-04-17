@@ -24,9 +24,9 @@ class Net(nn.Module):
 
     def __init__(self) -> None:
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 5)
+        self.conv1 = nn.Conv2d(1, 32, 5, padding=2)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(32, 64, 5)
+        self.conv2 = nn.Conv2d(32, 64, 5, padding=2)
         self.fc1 = nn.Linear((28//2//2) * (28//2//2)*64, 1024)
         self.fc2 = nn.Linear(1024, 62)
         # self.fc3 = nn.Linear(84, 10)
@@ -71,10 +71,11 @@ def test(net, testloader):
 
 def load_data():
     """Load CIFAR-10 (training and test set)."""
-    trf = Compose([ToTensor(), Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    trainset = CIFAR10("./data", train=True, download=True, transform=trf)
-    testset = CIFAR10("./data", train=False, download=True, transform=trf)
-    return DataLoader(trainset, batch_size=32, shuffle=True), DataLoader(testset)
+    # trf = Compose([ToTensor(), Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # trainset = CIFAR10("./data", train=True, download=True, transform=trf)
+    # testset = CIFAR10("./data", train=False, download=True, transform=trf)
+    # return DataLoader(trainset, batch_size=32, shuffle=True), DataLoader(testset)
+    return None, None
 
 
 # #############################################################################
@@ -96,32 +97,33 @@ class FlowerClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.set_parameters(parameters)
         train(net, trainloader, epochs=1)
-        return self.get_parameters(config={}), len(trainloader.dataset), {}
+        return self.get_parameters(config={}), 20, {}
 
     def evaluate(self, parameters, config):
         self.set_parameters(parameters)
         loss, accuracy = test(net, testloader)
-        return loss, len(testloader.dataset), {"accuracy": accuracy}
+        return loss, 20, {"accuracy": accuracy}
 
 
-from multiprocessing import Process
-
-
+# from multiprocessing import Process
+#
+#
 # class ClientManager(Process):
 #     def __init__(self, n_client):
 #         super().__init__()
 #         self.n_client = n_client
 #
 #     def run(self) -> None:
-
+#
+#         fl.client.start_numpy_client(
+#             server_address="127.0.0.1:8080",
+#             client=FlowerClient(),
+#         )
 
 
 if __name__ == '__main__':
-    # Load model and data (simple CNN, CIFAR-10)
-
-
     # Start Flower client
     fl.client.start_numpy_client(
-        server_address="127.0.0.1:8080",
+        server_address="172.24.224.187:8080",
         client=FlowerClient(),
     )
